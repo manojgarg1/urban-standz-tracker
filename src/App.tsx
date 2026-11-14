@@ -405,57 +405,67 @@ export const App: React.FC = () => {
       </footer>
 
       {/* Case Detail Modal */}
-      <CaseDetailModal
-        caseItem={selectedCaseForDetail}
-        onClose={() => setSelectedCaseForDetail(null)}
-        isAdmin={isAdmin}
-        onEditCase={(c) => {
-          setSelectedCaseForDetail(null);
-          setCaseToEdit(c);
-          setIsAddCaseOpen(true);
-        }}
-        onQuickUpdateHearing={(c) => {
-          setSelectedCaseForDetail(null);
-          setCaseForQuickHearing(c);
-        }}
-        onSelectLinkedCase={handleSelectLinkedCase}
-      />
+      {selectedCaseForDetail && (
+        <CaseDetailModal
+          caseItem={selectedCaseForDetail}
+          onClose={() => setSelectedCaseForDetail(null)}
+          isAdmin={isAdmin}
+          onEditCase={(c) => {
+            setSelectedCaseForDetail(null);
+            setCaseToEdit(c);
+            setIsAddCaseOpen(true);
+          }}
+          onQuickUpdateHearing={(c) => {
+            setSelectedCaseForDetail(null);
+            setCaseForQuickHearing(c);
+          }}
+          onSelectLinkedCase={handleSelectLinkedCase}
+        />
+      )}
 
       {/* Add / Edit Case Modal (Admin) */}
-      <CaseFormModal
-        isOpen={isAddCaseOpen}
-        onClose={() => {
-          setIsAddCaseOpen(false);
-          setCaseToEdit(null);
-        }}
-        caseToEdit={caseToEdit}
-        onSave={handleSaveCase}
-        existingCourts={existingCourts}
-      />
+      {isAddCaseOpen && (
+        <CaseFormModal
+          isOpen={isAddCaseOpen}
+          onClose={() => {
+            setIsAddCaseOpen(false);
+            setCaseToEdit(null);
+          }}
+          caseToEdit={caseToEdit}
+          onSave={handleSaveCase}
+          existingCourts={existingCourts}
+        />
+      )}
 
       {/* Quick Update Hearing Modal (Admin) */}
-      <UpdateHearingModal
-        caseItem={caseForQuickHearing}
-        isOpen={Boolean(caseForQuickHearing)}
-        onClose={() => setCaseForQuickHearing(null)}
-        onSave={handleQuickHearingSave}
-      />
+      {caseForQuickHearing && (
+        <UpdateHearingModal
+          caseItem={caseForQuickHearing}
+          isOpen={Boolean(caseForQuickHearing)}
+          onClose={() => setCaseForQuickHearing(null)}
+          onSave={handleQuickHearingSave}
+        />
+      )}
 
       {/* Admin Login Modal */}
-      <AdminLoginModal
-        isOpen={isAdminLoginOpen}
-        onClose={() => setIsAdminLoginOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      {isAdminLoginOpen && (
+        <AdminLoginModal
+          isOpen={isAdminLoginOpen}
+          onClose={() => setIsAdminLoginOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
 
       {/* Cloud Settings & Backup Modal */}
-      <CloudSettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        cases={cases}
-        onResetSeed={handleResetSeed}
-        onBulkImport={handleBulkImport}
-      />
+      {isSettingsOpen && (
+        <CloudSettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          cases={cases}
+          onResetSeed={handleResetSeed}
+          onBulkImport={handleBulkImport}
+        />
+      )}
     </div>
   );
 };

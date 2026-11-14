@@ -62,8 +62,6 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({
   onSave,
   existingCourts
 }) => {
-  if (!isOpen) return null;
-
   const isEditing = Boolean(caseToEdit);
 
   // Available court options (unique union of default and existing)
@@ -216,6 +214,8 @@ export const CaseFormModal: React.FC<CaseFormModalProps> = ({
       setIsSubmitting(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-200">

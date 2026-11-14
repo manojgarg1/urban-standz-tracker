@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   CalendarClock, 
@@ -60,18 +60,29 @@ export const UpdateHearingModal: React.FC<UpdateHearingModalProps> = ({
   onClose,
   onSave
 }) => {
-  if (!isOpen || !caseItem) return null;
-
   // Initial form states
-  const [nextHearing, setNextHearing] = useState(caseItem.nextHearing || '');
-  const [stage, setStage] = useState(caseItem.stage || 'Summons');
-  const [status, setStatus] = useState(caseItem.status || 'Pending');
+  const [nextHearing, setNextHearing] = useState(caseItem?.nextHearing || '');
+  const [stage, setStage] = useState(caseItem?.stage || 'Summons');
+  const [status, setStatus] = useState(caseItem?.status || 'Pending');
   
   // Format today's date for hearing entry
   const todayDefault = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const [orderDate, setOrderDate] = useState(todayDefault);
   const [orderText, setOrderText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync state when caseItem changes
+  useEffect(() => {
+    if (caseItem) {
+      setNextHearing(caseItem.nextHearing || '');
+      setStage(caseItem.stage || 'Summons');
+      setStatus(caseItem.status || 'Pending');
+      setOrderDate(new Date().toISOString().split('T')[0]);
+      setOrderText('');
+    }
+  }, [caseItem]);
+
+  if (!isOpen || !caseItem) return null;
 
   // Helper to add days to date
   const handleAddDays = (days: number) => {

@@ -32,17 +32,17 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
   onResetSeed,
   onBulkImport
 }) => {
-  if (!isOpen) return null;
-
   const currentConfig = getCloudConfig();
   const [supabaseUrl, setSupabaseUrl] = useState(currentConfig.supabaseUrl || '');
   const [supabaseKey, setSupabaseKey] = useState(currentConfig.supabaseAnonKey || '');
-  const [useSupabase, setUseSupabase] = useState(currentConfig.useSupabase);
+  const [useSupabase, setUseSupabase] = useState(currentConfig.useSupabase || false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [adminPass, setAdminPass] = useState(
     localStorage.getItem('urban_standz_admin_pass') || 'admin123'
   );
   const [passSaveSuccess, setPassSaveSuccess] = useState(false);
+
+  if (!isOpen) return null;
 
   const handleSaveCloud = (e: React.FormEvent) => {
     e.preventDefault();
