@@ -314,11 +314,6 @@ export const App: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <span className="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 text-[11px] font-medium">
-              Free Cloud Hosted • No Login Required to View
-            </span>
-          </div>
         </div>
 
         {/* Stats Metrics Dashboard */}
