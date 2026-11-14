@@ -398,8 +398,8 @@ export const App: React.FC = () => {
             Data sourced from public court daily cause lists and order sheets of Bengaluru City Civil & Sessions Court and CJM Bengaluru.
             Intended for mutual awareness and coordination among affected tenants and house owners.
           </p>
-          <p className="text-slate-600">
-            Can be deployed to Vercel, Netlify, Cloudflare Pages, or GitHub Pages with zero hosting costs.
+          <p className="text-slate-400 font-medium">
+            This portal is developed, deployed and maintained by Manoj Garg, who is one of the victims of Urban Standz Real Estate Scam
           </p>
         </div>
       </footer>
