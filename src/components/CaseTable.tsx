@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Eye, 
   CalendarClock, 
   Edit3, 
   Trash2, 
@@ -250,10 +249,12 @@ export const CaseTable: React.FC<CaseTableProps> = ({
                 </div>
               </th>
 
-              {/* Actions */}
-              <th className="py-3.5 px-3 text-right sticky right-0 bg-slate-900/95 min-w-[110px] shadow-sm select-none">
-                Actions
-              </th>
+              {/* Actions (Admin only) */}
+              {isAdmin && (
+                <th className="py-3.5 px-3 text-right sticky right-0 bg-slate-900/95 min-w-[100px] shadow-sm select-none">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/50">
@@ -399,53 +400,42 @@ export const CaseTable: React.FC<CaseTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Action Buttons */}
-                  <td 
-                    onClick={(e) => e.stopPropagation()} 
-                    className="py-3 px-3 text-right sticky right-0 bg-slate-800/95 group-hover:bg-slate-750 transition-colors shadow-sm"
-                  >
-                    <div className="flex items-center justify-end space-x-1">
-                      {/* View Button */}
-                      <button
-                        onClick={() => onViewCase(c)}
-                        title="View Case Details & Proceedings"
-                        className="p-1.5 text-slate-400 hover:text-court-300 hover:bg-slate-700/80 rounded-lg transition-colors"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                  {/* Action Buttons (Admin only) */}
+                  {isAdmin && (
+                    <td 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="py-3 px-3 text-right sticky right-0 bg-slate-800/95 group-hover:bg-slate-750 transition-colors shadow-sm"
+                    >
+                      <div className="flex items-center justify-end space-x-1">
+                        {/* Quick Update Hearing */}
+                        <button
+                          onClick={() => onQuickUpdateHearing(c)}
+                          title="Quick Update Hearing Details"
+                          className="p-1.5 text-amber-400 hover:text-amber-300 hover:bg-amber-950/60 rounded-lg transition-colors"
+                        >
+                          <CalendarClock className="w-4 h-4" />
+                        </button>
 
-                      {isAdmin && (
-                        <>
-                          {/* Quick Update Hearing */}
-                          <button
-                            onClick={() => onQuickUpdateHearing(c)}
-                            title="Quick Update Hearing Details"
-                            className="p-1.5 text-amber-400 hover:text-amber-300 hover:bg-amber-950/60 rounded-lg transition-colors"
-                          >
-                            <CalendarClock className="w-4 h-4" />
-                          </button>
+                        {/* Edit Full Case */}
+                        <button
+                          onClick={() => onEditCase(c)}
+                          title="Edit Full Case"
+                          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
 
-                          {/* Edit Full Case */}
-                          <button
-                            onClick={() => onEditCase(c)}
-                            title="Edit Full Case"
-                            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-
-                          {/* Delete Case */}
-                          <button
-                            onClick={() => onDeleteCase(c)}
-                            title="Delete Case"
-                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/60 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+                        {/* Delete Case */}
+                        <button
+                          onClick={() => onDeleteCase(c)}
+                          title="Delete Case"
+                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/60 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               );
             })}
