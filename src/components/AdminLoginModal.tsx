@@ -19,10 +19,9 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default admin passcode: admin123 (or check localStorage custom passcode)
-    const customPass = localStorage.getItem('urban_standz_admin_pass') || 'admin123';
+    const authorizedPass = localStorage.getItem('urban_standz_admin_pass') || 'Manoj070371@@';
     
-    if (passcode.trim() === customPass || passcode.trim() === 'admin123') {
+    if (passcode.trim() === authorizedPass) {
       setError(false);
       onLoginSuccess();
       onClose();
@@ -68,13 +67,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 setPasscode(e.target.value);
                 if (error) setError(false);
               }}
-              placeholder="Enter admin password (default: admin123)"
+              placeholder="Enter admin passcode"
               className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-court-500"
             />
             {error && (
               <p className="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
                 <ShieldAlert className="w-3.5 h-3.5" />
-                Incorrect passcode. Try <span className="font-mono font-semibold">admin123</span>
+                Incorrect passcode. Access denied.
               </p>
             )}
           </div>

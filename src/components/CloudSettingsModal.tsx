@@ -39,7 +39,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
   const [useSupabase, setUseSupabase] = useState(currentConfig.useSupabase || false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [adminPass, setAdminPass] = useState(
-    localStorage.getItem('urban_standz_admin_pass') || 'admin123'
+    localStorage.getItem('urban_standz_admin_pass') || 'Manoj070371@@'
   );
   const [passSaveSuccess, setPassSaveSuccess] = useState(false);
 
@@ -251,7 +251,7 @@ export const CloudSettingsModal: React.FC<CloudSettingsModalProps> = ({
             </h3>
             <div className="flex gap-2">
               <input
-                type="text"
+                type="password"
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
                 placeholder="Set new admin passcode"
