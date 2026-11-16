@@ -22,7 +22,7 @@ import {
   isAdminAuthenticated, 
   setAdminAuthenticated 
 } from './services/caseService';
-import { exportToExcel, exportToCSV, getHearingUrgency } from './utils/caseUtils';
+import { exportToExcel, exportToCSV, getHearingUrgency, isMissedUpdate } from './utils/caseUtils';
 import { Scale, Loader2, Info } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -104,8 +104,12 @@ export const App: React.FC = () => {
       }
 
       // 3. Status Filter
-      if (filters.status && (c.status || '').toLowerCase() !== filters.status.toLowerCase()) {
-        return false;
+      if (filters.status) {
+        if (filters.status === 'Missed Updates') {
+          if (!isMissedUpdate(c)) return false;
+        } else if ((c.status || '').toLowerCase() !== filters.status.toLowerCase()) {
+          return false;
+        }
       }
 
       // 4. Stage Filter
@@ -345,6 +349,7 @@ export const App: React.FC = () => {
             cases={filteredCases}
             isAdmin={isAdmin}
             onViewCase={(c) => setSelectedCaseForDetail(c)}
+            onSelectLinkedCase={handleSelectLinkedCase}
             onEditCase={(c) => {
               setCaseToEdit(c);
               setIsAddCaseOpen(true);
@@ -359,6 +364,7 @@ export const App: React.FC = () => {
             cases={filteredCases}
             isAdmin={isAdmin}
             onViewCase={(c) => setSelectedCaseForDetail(c)}
+            onSelectLinkedCase={handleSelectLinkedCase}
             onEditCase={(c) => {
               setCaseToEdit(c);
               setIsAddCaseOpen(true);

@@ -9,6 +9,7 @@ import {
   CalendarDays
 } from 'lucide-react';
 import { FilterState, CaseItem } from '../types';
+import { isMissedUpdate } from '../utils/caseUtils';
 
 interface FilterBarProps {
   filters: FilterState;
@@ -23,6 +24,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   cases,
   matchedCount
 }) => {
+  const missedCount = cases.filter(isMissedUpdate).length;
   // Extract distinct courts
   const courts = Array.from(new Set(cases.map(c => c.court).filter(Boolean))).sort();
 
@@ -158,6 +160,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           >
             <option value="">All Statuses</option>
             <option value="Pending">Pending (Active)</option>
+            <option value="Missed Updates">Missed Updates ({missedCount})</option>
             <option value="Disposed">Disposed / CC</option>
             <option value="Stayed">Stayed</option>
           </select>

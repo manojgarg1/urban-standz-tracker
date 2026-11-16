@@ -14,7 +14,7 @@ export interface CaseItem {
   defendant3?: string;
   defendant4?: string;
   advocate: string;
-  status: 'Pending' | 'Disposed' | 'Stayed' | string;
+  status: 'Pending' | 'Missed Updates' | 'Disposed' | 'Stayed' | string;
   stage: string;
   filingDate: string;
   nextHearing: string;

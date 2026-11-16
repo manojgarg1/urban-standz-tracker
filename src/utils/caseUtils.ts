@@ -51,6 +51,73 @@ export function parseLastBusiness(businessText: string): HearingLogEntry[] {
 }
 
 /**
+ * Parse a date string found in hearing logs (e.g. DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, YYYY-MM-DD)
+ */
+export function parseEntryDate(dateStr: string, referenceYear: number = new Date().getFullYear()): Date | null {
+  if (!dateStr || !dateStr.trim()) return null;
+  const cleaned = dateStr.trim();
+  
+  // Try DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+  const dmyMatch = cleaned.match(/^(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2,4}))?$/);
+  if (dmyMatch) {
+    const day = parseInt(dmyMatch[1], 10);
+    const month = parseInt(dmyMatch[2], 10) - 1;
+    let year = dmyMatch[3] ? parseInt(dmyMatch[3], 10) : referenceYear;
+    if (year < 100) year += 2000;
+    const d = new Date(year, month, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  
+  // Try YYYY-MM-DD
+  const ymdMatch = cleaned.match(/^(\d{4})[./-](\d{1,2})[./-](\d{1,2})$/);
+  if (ymdMatch) {
+    const year = parseInt(ymdMatch[1], 10);
+    const month = parseInt(ymdMatch[2], 10) - 1;
+    const day = parseInt(ymdMatch[3], 10);
+    const d = new Date(year, month, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  
+  const parsed = new Date(cleaned);
+  return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/**
+ * Check if a case qualifies as "Missed Updates":
+ * The scheduled hearing date has passed, but there are no updates recorded in Hearing history for that date.
+ */
+export function isMissedUpdate(c: CaseItem): boolean {
+  if ((c.status || '').toLowerCase() === 'disposed') return false;
+  if ((c.status || '').toLowerCase() === 'missed updates') return true;
+  if (!c.nextHearing || !c.nextHearing.trim()) return false;
+  
+  const parts = c.nextHearing.trim().split('-');
+  if (parts.length !== 3) return false;
+  const targetDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  if (isNaN(targetDate.getTime())) return false;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  
+  // Only applies if the scheduled hearing date is in the past
+  if (targetDate.getTime() >= today.getTime()) return false;
+  
+  // Check if any entry in lastBusiness matches or is after targetDate
+  const entries = parseLastBusiness(c.lastBusiness || '');
+  if (entries.length === 0) return true;
+  
+  const hasUpdateOnOrAfterHearing = entries.some(entry => {
+    const entryDate = parseEntryDate(entry.date, targetDate.getFullYear());
+    if (!entryDate) return false;
+    entryDate.setHours(0, 0, 0, 0);
+    return entryDate.getTime() >= targetDate.getTime();
+  });
+  
+  return !hasUpdateOnOrAfterHearing;
+}
+
+/**
  * Format date nicely e.g. "2026-11-26" to "26 Nov 2026"
  */
 export function formatDisplayDate(dateStr?: string): string {

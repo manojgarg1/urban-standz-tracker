@@ -5,10 +5,11 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   Building2, 
-  Users 
+  Users,
+  AlertCircle
 } from 'lucide-react';
 import { CaseItem } from '../types';
-import { getHearingUrgency } from '../utils/caseUtils';
+import { getHearingUrgency, isMissedUpdate } from '../utils/caseUtils';
 
 interface StatsOverviewProps {
   cases: CaseItem[];
@@ -24,6 +25,7 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
   const total = cases.length;
   const pending = cases.filter(c => (c.status || '').toLowerCase() === 'pending').length;
   const disposed = cases.filter(c => (c.status || '').toLowerCase() === 'disposed').length;
+  const missedUpdates = cases.filter(isMissedUpdate).length;
 
   // Calculate hearings in next 7 days, 14 days, 30 days
   let urgent7Days = 0;
@@ -44,7 +46,7 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
   });
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6 no-print">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6 no-print">
       {/* Total Cases */}
       <div 
         onClick={() => onSelectStatus('all')}
@@ -88,6 +90,25 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
         </div>
         <div className="mt-2 flex items-baseline">
           <span className="text-2xl font-bold text-emerald-400 tracking-tight">{disposed}</span>
+          <span className="ml-2 text-xs text-slate-400">cases</span>
+        </div>
+      </div>
+
+      {/* Missed Updates */}
+      <div 
+        onClick={() => onSelectStatus('Missed Updates')}
+        className={`bg-slate-800/90 hover:bg-slate-800 border rounded-xl p-3.5 cursor-pointer transition-all shadow-sm group ${
+          missedUpdates > 0 ? 'border-rose-600/70 bg-rose-950/20 hover:border-rose-500' : 'border-slate-700/80 hover:border-slate-600'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-slate-400 group-hover:text-slate-300">Missed Updates</span>
+          <AlertCircle className={`w-4 h-4 ${missedUpdates > 0 ? 'text-rose-400 animate-pulse' : 'text-slate-500'}`} />
+        </div>
+        <div className="mt-2 flex items-baseline">
+          <span className={`text-2xl font-bold tracking-tight ${missedUpdates > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+            {missedUpdates}
+          </span>
           <span className="ml-2 text-xs text-slate-400">cases</span>
         </div>
       </div>

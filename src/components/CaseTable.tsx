@@ -11,15 +11,17 @@ import {
   Gavel,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  AlertCircle
 } from 'lucide-react';
 import { CaseItem } from '../types';
-import { formatDisplayDate, getHearingUrgency } from '../utils/caseUtils';
+import { formatDisplayDate, getHearingUrgency, isMissedUpdate } from '../utils/caseUtils';
 
 interface CaseTableProps {
   cases: CaseItem[];
   isAdmin: boolean;
   onViewCase: (c: CaseItem) => void;
+  onSelectLinkedCase?: (caseRegNo: string) => void;
   onEditCase: (c: CaseItem) => void;
   onQuickUpdateHearing: (c: CaseItem) => void;
   onDeleteCase: (c: CaseItem) => void;
@@ -41,6 +43,7 @@ export const CaseTable: React.FC<CaseTableProps> = ({
   cases,
   isAdmin,
   onViewCase,
+  onSelectLinkedCase,
   onEditCase,
   onQuickUpdateHearing,
   onDeleteCase
@@ -282,15 +285,6 @@ export const CaseTable: React.FC<CaseTableProps> = ({
                   <td className="py-3 px-3">
                     <div className="font-bold text-white tracking-tight flex items-center gap-1.5 group-hover:text-court-300 transition-colors">
                       <span>{c.registrationNumber}</span>
-                      {c.linkedCase && (
-                        <span 
-                          title={`Linked Case: ${c.linkedCase}`}
-                          className="inline-flex items-center text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 px-1.5 py-0.2 rounded"
-                        >
-                          <LinkIcon className="w-2.5 h-2.5 mr-0.5" />
-                          Linked
-                        </span>
-                      )}
                     </div>
                     {c.cnr ? (
                       <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono mt-0.5">
@@ -308,7 +302,29 @@ export const CaseTable: React.FC<CaseTableProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[10px] text-slate-500 italic">No CNR listed</span>
+                      <span className="text-[10px] text-slate-500 italic block mt-0.5">No CNR listed</span>
+                    )}
+
+                    {/* Linked Case Button */}
+                    {c.linkedCase && (
+                      <div className="mt-1.5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onSelectLinkedCase) {
+                              onSelectLinkedCase(c.linkedCase!);
+                            } else {
+                              onViewCase(c);
+                            }
+                          }}
+                          title={`Open linked case: ${c.linkedCase}`}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-300 hover:text-white bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/60 hover:border-indigo-400 px-2 py-0.5 rounded transition-all group/link"
+                        >
+                          <LinkIcon className="w-3 h-3 text-indigo-400 group-hover/link:text-indigo-200 shrink-0" />
+                          <span>Linked to Case No {c.linkedCase}</span>
+                        </button>
+                      </div>
                     )}
                   </td>
 
@@ -392,11 +408,21 @@ export const CaseTable: React.FC<CaseTableProps> = ({
                       }`}>
                         {c.stage || 'Hearing'}
                       </span>
-                      <span className={`text-[10px] font-medium ${
-                        isDisposed ? 'text-slate-400' : 'text-emerald-400'
-                      }`}>
-                        ● {c.status || 'Pending'}
-                      </span>
+                      {isMissedUpdate(c) ? (
+                        <span 
+                          title="Scheduled hearing date has passed without hearing history update"
+                          className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-300 bg-rose-950/80 border border-rose-800/80 px-2 py-0.5 rounded-full"
+                        >
+                          <AlertCircle className="w-3 h-3 text-rose-400 animate-pulse shrink-0" />
+                          Missed Updates
+                        </span>
+                      ) : (
+                        <span className={`text-[10px] font-medium ${
+                          isDisposed ? 'text-slate-400' : 'text-emerald-400'
+                        }`}>
+                          ● {c.status || 'Pending'}
+                        </span>
+                      )}
                     </div>
                   </td>
 

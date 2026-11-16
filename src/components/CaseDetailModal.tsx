@@ -17,10 +17,11 @@ import {
   Search,
   History,
   ShieldCheck,
-  Scale
+  Scale,
+  AlertCircle
 } from 'lucide-react';
 import { CaseItem } from '../types';
-import { formatDisplayDate, getHearingUrgency, parseLastBusiness } from '../utils/caseUtils';
+import { formatDisplayDate, getHearingUrgency, parseLastBusiness, isMissedUpdate } from '../utils/caseUtils';
 
 interface CaseDetailModalProps {
   caseItem: CaseItem | null;
@@ -100,9 +101,19 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
               }`}>
                 {caseItem.stage || 'Hearing'}
               </span>
-              <span className={`text-xs font-semibold ${isDisposed ? 'text-slate-400' : 'text-emerald-400'}`}>
-                ● {caseItem.status || 'Pending'}
-              </span>
+              {isMissedUpdate(caseItem) ? (
+                <span 
+                  title="Scheduled hearing date has passed without hearing history update"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-rose-300 bg-rose-950/80 border border-rose-800/80 px-2.5 py-0.5 rounded-full"
+                >
+                  <AlertCircle className="w-3.5 h-3.5 text-rose-400 animate-pulse shrink-0" />
+                  Missed Updates
+                </span>
+              ) : (
+                <span className={`text-xs font-semibold ${isDisposed ? 'text-slate-400' : 'text-emerald-400'}`}>
+                  ● {caseItem.status || 'Pending'}
+                </span>
+              )}
             </div>
 
             {/* CNR & External Lookups */}
@@ -207,7 +218,7 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
                       onClick={() => onSelectLinkedCase(caseItem.linkedCase!)}
                       className="text-court-300 hover:text-white font-semibold underline text-xs mt-0.5 flex items-center gap-1"
                     >
-                      <span>{caseItem.linkedCase}</span>
+                      <span>Linked to Case No {caseItem.linkedCase}</span>
                       <ExternalLink className="w-3 h-3" />
                     </button>
                   </div>

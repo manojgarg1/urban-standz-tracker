@@ -11,15 +11,17 @@ import {
   Trash2, 
   Link as LinkIcon,
   ChevronRight,
-  Gavel
+  Gavel,
+  AlertCircle
 } from 'lucide-react';
 import { CaseItem } from '../types';
-import { formatDisplayDate, getHearingUrgency, parseLastBusiness } from '../utils/caseUtils';
+import { formatDisplayDate, getHearingUrgency, parseLastBusiness, isMissedUpdate } from '../utils/caseUtils';
 
 interface CaseCardsProps {
   cases: CaseItem[];
   isAdmin: boolean;
   onViewCase: (c: CaseItem) => void;
+  onSelectLinkedCase?: (caseRegNo: string) => void;
   onEditCase: (c: CaseItem) => void;
   onQuickUpdateHearing: (c: CaseItem) => void;
   onDeleteCase: (c: CaseItem) => void;
@@ -29,6 +31,7 @@ export const CaseCards: React.FC<CaseCardsProps> = ({
   cases,
   isAdmin,
   onViewCase,
+  onSelectLinkedCase,
   onEditCase,
   onQuickUpdateHearing,
   onDeleteCase
@@ -89,9 +92,19 @@ export const CaseCards: React.FC<CaseCardsProps> = ({
                   }`}>
                     {c.stage || 'Hearing'}
                   </span>
-                  <span className={`text-[10px] font-medium ${isDisposed ? 'text-slate-400' : 'text-emerald-400'}`}>
-                    ● {c.status || 'Pending'}
-                  </span>
+                  {isMissedUpdate(c) ? (
+                    <span 
+                      title="Scheduled hearing date has passed without hearing history update"
+                      className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-300 bg-rose-950/80 border border-rose-800/80 px-2 py-0.5 rounded-full"
+                    >
+                      <AlertCircle className="w-3 h-3 text-rose-400 animate-pulse shrink-0" />
+                      Missed Updates
+                    </span>
+                  ) : (
+                    <span className={`text-[10px] font-medium ${isDisposed ? 'text-slate-400' : 'text-emerald-400'}`}>
+                      ● {c.status || 'Pending'}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -139,10 +152,22 @@ export const CaseCards: React.FC<CaseCardsProps> = ({
                   </span>
                 </div>
                 {c.linkedCase && (
-                  <span className="inline-flex items-center text-[10px] bg-indigo-950/80 text-indigo-300 border border-indigo-700/60 px-1.5 py-0.5 rounded">
-                    <LinkIcon className="w-2.5 h-2.5 mr-1" />
-                    {c.linkedCase}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onSelectLinkedCase) {
+                        onSelectLinkedCase(c.linkedCase!);
+                      } else {
+                        onViewCase(c);
+                      }
+                    }}
+                    title={`Open linked case: ${c.linkedCase}`}
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-300 hover:text-white bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/60 hover:border-indigo-400 px-2 py-0.5 rounded transition-all"
+                  >
+                    <LinkIcon className="w-2.5 h-2.5 mr-0.5 text-indigo-400 shrink-0" />
+                    <span>Linked to Case No {c.linkedCase}</span>
+                  </button>
                 )}
               </div>
 
