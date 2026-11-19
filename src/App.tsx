@@ -134,6 +134,8 @@ export const App: React.FC = () => {
 
         if (filters.hearingRange === 'today') {
           if (days !== 0) return false;
+        } else if (filters.hearingRange === 'tomorrow') {
+          if (days !== 1) return false;
         } else if (filters.hearingRange === 'this-week') {
           if (days === null || days < 0 || days > 7) return false;
         } else if (filters.hearingRange === 'next-14-days') {

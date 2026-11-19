@@ -140,6 +140,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           >
             <option value="all">All Dates</option>
             <option value="today">Today</option>
+            <option value="tomorrow">Tomorrow</option>
             <option value="this-week">Next 7 Days (Urgent)</option>
             <option value="next-14-days">Next 14 Days</option>
             <option value="next-30-days">Next 30 Days</option>

@@ -39,7 +39,7 @@ export interface FilterState {
   stage: string;
   advocate: string;
   category: string;
-  hearingRange: 'all' | 'today' | 'this-week' | 'next-14-days' | 'next-30-days' | 'past' | 'no-date';
+  hearingRange: 'all' | 'today' | 'tomorrow' | 'this-week' | 'next-14-days' | 'next-30-days' | 'past' | 'no-date';
   sortBy: 'serialNumber' | 'nextHearing' | 'filingDate' | 'registrationNumber' | 'plaintiff1';
   sortOrder: 'asc' | 'desc';
 }
