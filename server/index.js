@@ -91,25 +91,36 @@ app.post('/api/contact', async (req, res) => {
 
     console.log(`[ADMIN_CONTACT] Forwarding message from ${name} (${email}) to Admin`);
 
-    // Try server-side relay
+    // Dispatch via FormSubmit
     let emailSent = false;
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(RECIPIENT_EMAIL)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Referer': 'https://urban-standz-tracker.vercel.app',
+          'Origin': 'https://urban-standz-tracker.vercel.app'
+        },
         body: JSON.stringify({
-          access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
-          to_email: RECIPIENT_EMAIL,
-          from_name: `Urban Standz Contact: ${name}`,
-          subject: emailSubject,
-          message: `Sender: ${name}\nPhone: ${phone}\nEmail: ${email}\nRole: ${senderRole}\nSubject: ${subject}\nFIR: ${firNumber}\nCase: ${caseDetails}\n\nMessage:\n${message || comments}`,
-          replyto: email
+          name: name,
+          email: email,
+          phone: phone || 'Not provided',
+          role: senderRole,
+          subject: subject || 'General Inquiry',
+          firNumber: firNumber || 'N/A',
+          caseDetails: caseDetails || 'N/A',
+          message: message || comments || '',
+          _subject: emailSubject,
+          _replyto: email,
+          _template: 'table',
+          _captcha: 'false'
         })
       });
       const data = await response.json();
-      if (data && data.success) emailSent = true;
+      if (data && (data.success === 'true' || data.success === true)) emailSent = true;
     } catch (err) {
-      // Ignore
+      console.error('FormSubmit server relay error:', err);
     }
 
     return res.json({

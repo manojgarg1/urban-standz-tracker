@@ -1,8 +1,8 @@
 // Vercel Serverless Function: /api/contact
-// Securely forwards Admin Contact submissions and Victim Intake to the administrator without exposing the destination email externally.
+// Securely forwards Admin Contact submissions to garg.blr@gmail.com via FormSubmit without exposing the email externally.
 
 export default async function handler(req, res) {
-  // Set CORS headers
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-    // Server-side recipient email (STRICTLY CONFIDENTIAL - Never exposed to client)
+    // Server-side confidential recipient email
     const RECIPIENT_EMAIL = process.env.ADMIN_CONTACT_EMAIL || 'garg.blr@gmail.com';
 
     const { 
@@ -30,7 +30,6 @@ export default async function handler(req, res) {
       email, 
       subject, 
       userType, 
-      role, 
       firNumber, 
       caseDetails, 
       message, 
@@ -38,68 +37,64 @@ export default async function handler(req, res) {
     } = body;
 
     if (!name || !email) {
-      return res.status(400).json({ error: 'Name and Email are required fields.' });
+      return res.status(400).json({ error: 'Name and Email are required.' });
     }
 
-    const senderRole = userType || role || 'Visitor';
+    const senderRole = userType || 'Visitor';
     const emailSubject = `[Urban Standz Admin Contact] ${subject || 'New Message'} from ${name} (${senderRole})`;
-    
-    const emailBody = `
-===================================================
-New Admin Contact Message - Urban Standz Action Portal
-===================================================
-Sender Name:    ${name}
-Sender Phone:   ${phone || 'Not provided'}
-Sender Email:   ${email}
-Category / Role:${senderRole}
-Subject:        ${subject || 'General Inquiry'}
+    const fullMessage = message || comments || 'No message content provided';
 
-FIR Number:     ${firNumber || 'N/A'}
-Court Case:     ${caseDetails || 'N/A'}
+    console.log(`[ADMIN_CONTACT] Routing message from ${name} (${email}) to Admin`);
 
-Message / Details:
----------------------------------------------------
-${message || comments || 'No message provided'}
+    // 1. Dispatch via FormSubmit AJAX API with server-side origin headers
+    let emailDispatched = false;
+    let providerMessage = '';
 
----------------------------------------------------
-Submitted At:   ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
-Privacy Status: Securely routed by Portal Server. Recipient email kept strictly confidential.
-===================================================
-    `.trim();
-
-    console.log(`[ADMIN_CONTACT_DISPATCH] Forwarding message from ${name} (${email}) to Admin`);
-
-    // Dispatch via server-side relay
-    let emailSent = false;
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(RECIPIENT_EMAIL)}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Referer': 'https://urban-standz-tracker.vercel.app',
+          'Origin': 'https://urban-standz-tracker.vercel.app'
+        },
         body: JSON.stringify({
-          access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
-          to_email: RECIPIENT_EMAIL,
-          from_name: `Urban Standz Contact: ${name}`,
-          subject: emailSubject,
-          message: emailBody,
-          replyto: email
+          name: name,
+          email: email,
+          phone: phone || 'Not provided',
+          role: senderRole,
+          subject: subject || 'General Inquiry',
+          firNumber: firNumber || 'N/A',
+          caseDetails: caseDetails || 'N/A',
+          message: fullMessage,
+          _subject: emailSubject,
+          _replyto: email,
+          _template: 'table',
+          _captcha: 'false'
         })
       });
-      const data = await response.json();
-      if (data && data.success) {
-        emailSent = true;
+
+      const data = await response.json().catch(() => ({}));
+      console.log('[FORMSUBMIT_RESPONSE]:', data);
+
+      if (data && (data.success === 'true' || data.success === true)) {
+        emailDispatched = true;
+      } else if (data && data.message) {
+        providerMessage = data.message;
       }
-    } catch (relayErr) {
-      console.warn('[ADMIN_CONTACT_RELAY_NOTE]:', relayErr.message);
+    } catch (err) {
+      console.error('[FORMSUBMIT_ERROR]:', err);
     }
 
-    // Always return safe client response without any email information
+    // 2. Safe client response (Never leaking the admin email)
     return res.status(200).json({
       success: true,
-      emailSent,
-      message: 'Your message has been securely sent to the administrator. We will get back to you shortly.'
+      emailDispatched,
+      message: 'Your message has been securely sent to the administrator.'
     });
   } catch (error) {
-    console.error('[ADMIN_CONTACT_ERROR]:', error);
+    console.error('[CONTACT_ERROR]:', error);
     return res.status(500).json({ error: 'Internal server error processing contact request' });
   }
 }
