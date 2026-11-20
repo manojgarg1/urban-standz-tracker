@@ -11,7 +11,8 @@ import {
   Unlock, 
   PlusCircle, 
   Settings, 
-  Printer 
+  Printer,
+  Newspaper
 } from 'lucide-react';
 import { ViewMode } from '../types';
 
@@ -120,6 +121,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <BarChart3 className="w-3.5 h-3.5" />
               <span>Analytics</span>
+            </button>
+
+            <button
+              onClick={() => onViewChange('resources')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                currentView === 'resources'
+                  ? 'bg-court-600 text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              <Newspaper className="w-3.5 h-3.5" />
+              <span>News & Media</span>
             </button>
           </nav>
 
@@ -231,6 +244,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <BarChart3 className="w-3.5 h-3.5" />
             <span>Stats</span>
+          </button>
+          <button
+            onClick={() => onViewChange('resources')}
+            className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-xs ${
+              currentView === 'resources' ? 'bg-court-600 text-white' : 'text-slate-400'
+            }`}
+          >
+            <Newspaper className="w-3.5 h-3.5" />
+            <span>News</span>
           </button>
         </div>
       </div>

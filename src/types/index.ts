@@ -30,7 +30,20 @@ export interface HearingLogEntry {
   raw: string;
 }
 
-export type ViewMode = 'table' | 'cards' | 'calendar' | 'analytics';
+export type ViewMode = 'table' | 'cards' | 'calendar' | 'analytics' | 'resources';
+
+export interface ResourceItem {
+  id: string;
+  title: string;
+  url: string;
+  platform: 'YouTube' | 'Facebook' | 'News' | 'TV Media' | 'Twitter / X' | 'Document' | 'Other' | string;
+  category: 'Media Report' | 'Victim Testimonial' | 'Legal Analysis' | 'Police / FIR' | 'Public Advisory' | 'Other';
+  description?: string;
+  publishedDate?: string;
+  authorOrSource?: string;
+  thumbnailUrl?: string;
+  createdAt: string;
+}
 
 export interface FilterState {
   search: string;

@@ -6,12 +6,14 @@ import { CaseTable } from './components/CaseTable';
 import { CaseCards } from './components/CaseCards';
 import { HearingCalendar } from './components/HearingCalendar';
 import { AnalyticsView } from './components/AnalyticsView';
+import { ResourcesView } from './components/ResourcesView';
 import { CaseDetailModal } from './components/CaseDetailModal';
 import { CaseFormModal } from './components/CaseFormModal';
 import { UpdateHearingModal } from './components/UpdateHearingModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { CloudSettingsModal } from './components/CloudSettingsModal';
-import { CaseItem, ViewMode, FilterState } from './types';
+import { ResourceFormModal } from './components/ResourceFormModal';
+import { CaseItem, ViewMode, FilterState, ResourceItem } from './types';
 import { 
   getAllCases, 
   saveCase, 
@@ -22,8 +24,13 @@ import {
   isAdminAuthenticated, 
   setAdminAuthenticated 
 } from './services/caseService';
+import { 
+  getAllResources, 
+  saveResource, 
+  deleteResource 
+} from './services/resourceService';
 import { exportToExcel, exportToCSV, getHearingUrgency, isMissedUpdate } from './utils/caseUtils';
-import { Scale, Loader2, Info } from 'lucide-react';
+import { Scale, Loader2, Info, Newspaper } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [cases, setCases] = useState<CaseItem[]>([]);
@@ -52,14 +59,23 @@ export const App: React.FC = () => {
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Load cases on mount
+  // Resources state
+  const [resources, setResources] = useState<ResourceItem[]>([]);
+  const [isAddResourceOpen, setIsAddResourceOpen] = useState(false);
+  const [resourceToEdit, setResourceToEdit] = useState<ResourceItem | null>(null);
+
+  // Load cases and resources on mount
   useEffect(() => {
     async function load() {
       try {
-        const data = await getAllCases();
-        setCases(data);
+        const [caseData, resourceData] = await Promise.all([
+          getAllCases(),
+          getAllResources()
+        ]);
+        setCases(caseData);
+        setResources(resourceData);
       } catch (e) {
-        console.error('Failed to load cases:', e);
+        console.error('Failed to load portal data:', e);
       } finally {
         setIsLoading(false);
       }
@@ -253,6 +269,21 @@ export const App: React.FC = () => {
     setCases(updated);
   };
 
+  // Resource Handlers (Admin)
+  const handleSaveResource = async (item: Partial<ResourceItem>) => {
+    await saveResource(item);
+    const updated = await getAllResources();
+    setResources(updated);
+  };
+
+  const handleDeleteResource = async (item: ResourceItem) => {
+    if (confirm(`Are you sure you want to delete the resource "${item.title}"?`)) {
+      await deleteResource(item.id);
+      const updated = await getAllResources();
+      setResources(updated);
+    }
+  };
+
   // Linked Case click handler
   const handleSelectLinkedCase = (caseRegNo: string) => {
     const match = cases.find(c => 
@@ -320,6 +351,17 @@ export const App: React.FC = () => {
               </p>
             </div>
           </div>
+          <button
+            onClick={() => setCurrentView(currentView === 'resources' ? 'table' : 'resources')}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all shrink-0 ${
+              currentView === 'resources'
+                ? 'bg-court-600 text-white border-court-500'
+                : 'bg-slate-800 text-court-300 border-slate-700 hover:bg-slate-750 hover:text-white'
+            }`}
+          >
+            <Newspaper className="w-3.5 h-3.5" />
+            <span>{currentView === 'resources' ? 'View Court Cases' : `News & Media Reports (${resources.length})`}</span>
+          </button>
         </div>
 
         {/* Stats Metrics Dashboard */}
@@ -387,6 +429,22 @@ export const App: React.FC = () => {
 
         {currentView === 'analytics' && (
           <AnalyticsView cases={cases} />
+        )}
+
+        {currentView === 'resources' && (
+          <ResourcesView
+            resources={resources}
+            isAdmin={isAdmin}
+            onOpenAddResource={() => {
+              setResourceToEdit(null);
+              setIsAddResourceOpen(true);
+            }}
+            onEditResource={(res) => {
+              setResourceToEdit(res);
+              setIsAddResourceOpen(true);
+            }}
+            onDeleteResource={handleDeleteResource}
+          />
         )}
       </main>
 
@@ -467,6 +525,19 @@ export const App: React.FC = () => {
           cases={cases}
           onResetSeed={handleResetSeed}
           onBulkImport={handleBulkImport}
+        />
+      )}
+
+      {/* Resource Form Modal (Admin) */}
+      {isAddResourceOpen && (
+        <ResourceFormModal
+          isOpen={isAddResourceOpen}
+          onClose={() => {
+            setIsAddResourceOpen(false);
+            setResourceToEdit(null);
+          }}
+          onSave={handleSaveResource}
+          resourceToEdit={resourceToEdit}
         />
       )}
     </div>

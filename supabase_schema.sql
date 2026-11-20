@@ -60,3 +60,38 @@ WITH CHECK (true);
 -- TO authenticated 
 -- USING (true) 
 -- WITH CHECK (true);
+
+-- ==========================================================
+-- 6. Create Resources Table for News and External Media Links
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS public.resources (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  platform TEXT DEFAULT 'News',
+  category TEXT DEFAULT 'Media Report',
+  description TEXT,
+  published_date DATE,
+  author_or_source TEXT,
+  thumbnail_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- Index on created_at
+CREATE INDEX IF NOT EXISTS idx_resources_created_at ON public.resources(created_at DESC);
+
+-- Enable RLS
+ALTER TABLE public.resources ENABLE ROW LEVEL SECURITY;
+
+-- Policies for Resources
+CREATE POLICY "Public users can view resources" 
+ON public.resources 
+FOR SELECT 
+USING (true);
+
+CREATE POLICY "Public with anon key can write resources" 
+ON public.resources 
+FOR ALL 
+USING (true) 
+WITH CHECK (true);
+
