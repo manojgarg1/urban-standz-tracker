@@ -9,14 +9,10 @@ import {
   PlusCircle, 
   Trash2, 
   MessageSquare,
-  Send,
-  X,
-  CheckCircle2,
   Lock,
-  Loader2
+  ArrowRight
 } from 'lucide-react';
-import { VictimItem, VictimContactMessage } from '../types';
-import { sendMessageToVictim } from '../services/victimService';
+import { VictimItem } from '../types';
 
 interface VictimsDirectoryViewProps {
   victims: VictimItem[];
@@ -33,15 +29,6 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<'All' | 'Tenant' | 'House Owner' | 'Both'>('All');
-
-  // Contact / Message modal state
-  const [activeVictimForMessage, setActiveVictimForMessage] = useState<VictimItem | null>(null);
-  const [senderName, setSenderName] = useState('');
-  const [senderContact, setSenderContact] = useState('');
-  const [senderRole, setSenderRole] = useState('Tenant');
-  const [messageText, setMessageText] = useState('');
-  const [isSendingMessage, setIsSendingMessage] = useState(false);
-  const [messageSuccess, setMessageSuccess] = useState<string | null>(null);
 
   // Filtered victims
   const filteredVictims = useMemo(() => {
@@ -71,38 +58,6 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
   const tenantsCount = useMemo(() => victims.filter(v => v.role === 'Tenant' || v.role === 'Both').length, [victims]);
   const ownersCount = useMemo(() => victims.filter(v => v.role === 'House Owner' || v.role === 'Both').length, [victims]);
 
-  const handleOpenMessageModal = (victim: VictimItem) => {
-    setActiveVictimForMessage(victim);
-    setMessageSuccess(null);
-    setMessageText('');
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeVictimForMessage || !senderName.trim() || !senderContact.trim() || !messageText.trim()) {
-      return;
-    }
-
-    setIsSendingMessage(true);
-    try {
-      const payload: VictimContactMessage = {
-        victimId: activeVictimForMessage.id,
-        victimName: activeVictimForMessage.name,
-        senderName: senderName.trim(),
-        senderContact: senderContact.trim(),
-        senderRole,
-        message: messageText.trim()
-      };
-
-      const res = await sendMessageToVictim(payload);
-      setMessageSuccess(res.message || `Your message was securely relayed to ${activeVictimForMessage.name}.`);
-    } catch (err: any) {
-      setMessageSuccess(`Your message has been queued and will be forwarded to ${activeVictimForMessage.name}.`);
-    } finally {
-      setIsSendingMessage(false);
-    }
-  };
-
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* Header Banner */}
@@ -110,13 +65,13 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
         <div className="space-y-1">
           <div className="inline-flex items-center space-x-2 text-sky-400 font-semibold text-xs mb-1">
             <Users className="w-4 h-4" />
-            <span>Community Registry & Mutual Coordination</span>
+            <span>Community Registry</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Victims Directory
           </h1>
           <p className="text-xs text-slate-400 max-w-xl">
-            A verified registry of tenants and property owners affected by Urban Standz Private Limited. To protect victim privacy, personal contact details are confidential; you can securely send a message through the portal.
+            A registry of tenants and property owners affected by Urban Standz Private Limited. To protect victim privacy, contact details are kept strictly confidential.
           </p>
         </div>
 
@@ -125,7 +80,7 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
           className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all shrink-0 self-start sm:self-auto"
         >
           <PlusCircle className="w-4 h-4" />
-          <span>Register in Directory</span>
+          <span>Register Case in Directory</span>
         </button>
       </div>
 
@@ -157,7 +112,7 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
           <Lock className="w-4 h-4" />
         </div>
         <p className="text-slate-400 leading-relaxed text-[11px]">
-          <strong className="text-slate-200">100% Privacy-Protected:</strong> Victims' phone numbers and email addresses are never displayed publicly. You can click <strong>"Contact Victim"</strong> on any entry to relay a confidential message directly to them.
+          <strong className="text-slate-200">Privacy Safeguard:</strong> Personal contact numbers and email addresses are never displayed in the public directory. Only verified case dispute summaries, FIR numbers, and court references are shared for collective awareness.
         </p>
       </div>
 
@@ -210,10 +165,23 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
 
       {/* Victims Cards Grid */}
       {filteredVictims.length === 0 ? (
-        <div className="text-center py-12 bg-slate-900 border border-slate-800 rounded-3xl p-8">
-          <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm font-semibold text-slate-300">No Victims Found</p>
-          <p className="text-xs text-slate-500 mt-1">Try clearing your search query or role filter.</p>
+        <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-slate-800/80 text-slate-500 flex items-center justify-center mx-auto border border-slate-700/60">
+            <Users className="w-8 h-8 text-court-400/60" />
+          </div>
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h3 className="text-base font-bold text-white">No Registered Victims Listed Yet</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              This directory is populated when affected tenants or property owners submit their dispute details. If you have been defrauded by Urban Standz, submit your case details to be registered.
+            </p>
+          </div>
+          <button
+            onClick={onNavigateToContact}
+            className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all"
+          >
+            <span>Register in Directory</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -291,173 +259,24 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
                 )}
               </div>
 
-              {/* Bottom Actions: Contact Victim Button & Admin Delete */}
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => handleOpenMessageModal(victim)}
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-court-600 hover:bg-court-500 text-white text-xs font-semibold transition-all shadow-sm"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Contact Victim</span>
-                </button>
+              {/* Bottom Row: Date & Admin Delete */}
+              <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                <span>
+                  Registered: {new Date(victim.createdAt).toLocaleDateString('en-IN')}
+                </span>
 
-                <div className="flex items-center space-x-2">
-                  <span className="text-[10px] text-slate-500">
-                    Added: {new Date(victim.createdAt).toLocaleDateString('en-IN')}
-                  </span>
-
-                  {isAdmin && (
-                    <button
-                      onClick={() => onDeleteVictim(victim)}
-                      className="p-1 rounded text-rose-400 hover:text-rose-300 hover:bg-rose-950/40"
-                      title="Delete victim entry"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => onDeleteVictim(victim)}
+                    className="p-1 rounded text-rose-400 hover:text-rose-300 hover:bg-rose-950/40"
+                    title="Delete victim entry"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Send Message to Victim Modal */}
-      {activeVictimForMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 text-white shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div>
-                <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                  <MessageSquare className="w-4 h-4 text-court-400" />
-                  <span>Message {activeVictimForMessage.name}</span>
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Relay a private message to this {activeVictimForMessage.role}
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveVictimForMessage(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {messageSuccess ? (
-              <div className="p-6 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-bold text-white">Message Relayed Successfully!</p>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {messageSuccess}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setActiveVictimForMessage(null)}
-                  className="px-4 py-2 rounded-xl bg-court-600 hover:bg-court-500 text-white font-semibold text-xs"
-                >
-                  Close Window
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSendMessage} className="space-y-3.5 text-xs">
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-400 text-[11px] leading-relaxed flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>
-                    Your message and contact details will be securely forwarded to {activeVictimForMessage.name}. Their personal phone/email remains protected.
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={senderName}
-                    onChange={(e) => setSenderName(e.target.value)}
-                    placeholder="e.g. Anand Sharma"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-court-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
-                    Your Phone Number or Email ID *
-                  </label>
-                  <input
-                    type="text"
-                    value={senderContact}
-                    onChange={(e) => setSenderContact(e.target.value)}
-                    placeholder="+91 98XXXXXXXX or name@example.com (so victim can reply)"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-court-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
-                    Are you a Tenant, House Owner, or Advocate?
-                  </label>
-                  <select
-                    value={senderRole}
-                    onChange={(e) => setSenderRole(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-court-500"
-                  >
-                    <option value="Tenant">Fellow Tenant</option>
-                    <option value="House Owner">Fellow House Owner</option>
-                    <option value="Advocate">Legal Counsel / Advocate</option>
-                    <option value="Neighbor / Citizen">Neighbor / Citizen</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">
-                    Your Message / Coordination Note *
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Hello, I am also affected by Urban Standz in the same area / court case. Would like to connect for joint legal coordination..."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-court-500"
-                    required
-                  />
-                </div>
-
-                <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setActiveVictimForMessage(null)}
-                    className="px-4 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSendingMessage}
-                    className="px-5 py-2 rounded-xl bg-court-600 hover:bg-court-500 text-white font-semibold flex items-center space-x-2"
-                  >
-                    {isSendingMessage ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Send Message</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
         </div>
       )}
     </div>

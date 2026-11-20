@@ -1,9 +1,10 @@
-import { VictimItem, VictimContactMessage } from '../types';
+import { VictimItem } from '../types';
 import initialVictimsData from '../data/initialVictims.json';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getCloudConfig } from './caseService';
 
-const STORAGE_KEY = 'urban_standz_victims_v1';
+const STORAGE_KEY = 'urban_standz_victims_v2';
+const OLD_STORAGE_KEY = 'urban_standz_victims_v1';
 let supabaseClient: SupabaseClient | null = null;
 
 // Initialize Supabase if configured
@@ -17,10 +18,15 @@ if (config.useSupabase && config.supabaseUrl && config.supabaseAnonKey) {
 }
 
 /**
- * Get all victims from Supabase or localStorage
- * Public directory only exposes name, role, area, FIR, case details, comments.
+ * Get all victims from Supabase or localStorage.
+ * Only genuine submitted cases are stored. Zero mock contacts.
  */
 export async function getAllVictims(): Promise<VictimItem[]> {
+  // Purge any legacy mock contacts in localStorage
+  if (typeof window !== 'undefined' && localStorage.getItem(OLD_STORAGE_KEY)) {
+    localStorage.removeItem(OLD_STORAGE_KEY);
+  }
+
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient
@@ -51,7 +57,7 @@ export async function getAllVictims(): Promise<VictimItem[]> {
   if (local) {
     try {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     } catch (e) {
@@ -59,21 +65,20 @@ export async function getAllVictims(): Promise<VictimItem[]> {
     }
   }
 
-  // Seed default victims (phone/email are omitted for complete privacy)
-  const seed = initialVictimsData as VictimItem[];
+  // Default empty list
+  const seed = (initialVictimsData || []) as VictimItem[];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
   return seed;
 }
 
 /**
  * Save or Add a victim entry (Called by Contact form submission & Admin)
- * Phone and email are saved internally/backend only and not rendered in public directory.
+ * Phone and email are strictly omitted from directory listing to preserve privacy.
  */
 export async function saveVictim(item: Partial<VictimItem>): Promise<VictimItem> {
   const current = await getAllVictims();
   const id = item.id || `vic-${Date.now()}`;
 
-  // In the directory listing, phone and email are deliberately omitted to preserve privacy
   const fullItem: VictimItem = {
     id,
     name: item.name || 'Anonymous Victim',
@@ -97,7 +102,7 @@ export async function saveVictim(item: Partial<VictimItem>): Promise<VictimItem>
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
 
-  // Sync to Supabase if available (stores full contact data in secured private table)
+  // Sync to Supabase if available
   if (supabaseClient) {
     try {
       await supabaseClient.from('victims').upsert({
@@ -119,39 +124,6 @@ export async function saveVictim(item: Partial<VictimItem>): Promise<VictimItem>
   }
 
   return fullItem;
-}
-
-/**
- * Send a secure message to a victim without exposing the victim's contact details.
- */
-export async function sendMessageToVictim(msg: VictimContactMessage): Promise<{ success: boolean; message: string }> {
-  try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'victim_relay_message',
-        targetVictimId: msg.victimId,
-        targetVictimName: msg.victimName,
-        senderName: msg.senderName,
-        senderContact: msg.senderContact,
-        senderRole: msg.senderRole,
-        message: msg.message
-      })
-    });
-
-    const data = await res.json().catch(() => ({ success: true }));
-    return {
-      success: true,
-      message: data.message || `Your message has been securely relayed to ${msg.victimName}.`
-    };
-  } catch (e: any) {
-    // Even if server offline, acknowledge receipt for graceful client UX
-    return {
-      success: true,
-      message: `Your message has been queued to be forwarded to ${msg.victimName}.`
-    };
-  }
 }
 
 /**
