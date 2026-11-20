@@ -1,0 +1,67 @@
+[
+  {
+    "id": "ord-1",
+    "title": "Ad-Interim Temporary Injunction Order under Order 39 Rules 1 & 2 CPC",
+    "caseRegistrationNumber": "O.S./5965/2026",
+    "court": "City Civil Court, Bengaluru (CCH-23)",
+    "orderDate": "2026-08-13",
+    "orderType": "Interim Injunction",
+    "parties": "Tenant Plaintiff vs Urban Standz Pvt Ltd & Property Owner",
+    "judge": "City Civil Judge (CCH-23)",
+    "orderSummary": "Court granted ad-interim injunction restraining defendants, their men, and agents from forcefully interfering with possession or dispossessing tenant except by due process of law.",
+    "fullText": "13/08/2026: O R D E R Issue an ad-interim order of temporary injunction restraining the defendant his men, agents, or any persons claiming through the defendants from interfering or dispossessing the plaintiff from the schedule property except the due process of law. The plaintiff shall comply the provisions under Order 39 Rule 3 of CPC. Issue emergent notice on I.A. No.1 and suit summons to the defendant No.1 Returnable by 05.11.2026.\n05/11/2026: Plaintiff counsel files application u/s. 151 of CPC for the extension of TI. Perused and allowed. TI is extended till next hearing date. Sri.SVR advocate filed vakalath for the D2 and prays time for WS and objections. Reissue emergent notice on IA No.1 and SS to the D1 through speed post. Returnable by 25.01.2027.",
+    "createdAt": "2026-08-13T12:00:00Z"
+  },
+  {
+    "id": "ord-2",
+    "title": "Status Quo Order Restraining Interference with Schedule Property",
+    "caseRegistrationNumber": "O.S./5916/2026",
+    "court": "City Civil Court, Bengaluru",
+    "orderDate": "2026-08-12",
+    "orderType": "Status Quo",
+    "parties": "Plaintiff vs Urban Standz Private Limited & Others",
+    "judge": "City Civil Judge",
+    "orderSummary": "Both parties directed to maintain status quo regarding property possession till next hearing date. Ad-interim relief extended on 27/10/2026.",
+    "fullText": "12/08/2026: Both the parties are directed to maintain the statusquo with respect to the schedule property till next date of hearing. The plaintiff shall comply the provisions under order 39 rule 3 of CPC. Issue emergent notice on IA No.1 and suit summons to the defendant Returnable by 27.10.2026.\n27/10/2026: Plaintiff counsel files application u/s. 151 of CPC for the extension of TI. Perused and allowed. TI is extended till next hearing date. Advocate for the plaintiff is present. Returnable by 25.01.2027.",
+    "createdAt": "2026-08-12T11:30:00Z"
+  },
+  {
+    "id": "ord-3",
+    "title": "Substituted Service via Paper Publication in 'Samyuktha Karnataka' (Order 5 Rule 20 CPC)",
+    "caseRegistrationNumber": "O.S./6357/2026",
+    "court": "City Civil Court, Bengaluru",
+    "orderDate": "2026-10-16",
+    "orderType": "Paper Publication",
+    "parties": "Plaintiff vs Urban Standz Pvt Ltd & Muniraju Madanraj / Nithin Honnegowda",
+    "judge": "City Civil Judge",
+    "orderSummary": "Since summons to Defendant No. 1 returned unserved (left registered address & door locked), Court allowed I.A. No. 2 to serve summons by public newspaper advertisement in Samyuktha Karnataka.",
+    "fullText": "16/10/2026: Sri.K.T Advocate filed the memo undertaking to file the vakalath of defendant No.2. The plaintiff counsel filed I.A.No.2 under Order 5 Rule 20 of CPC to issue summons to the defendant No.1 through publication in Samyuktha Karnataka. Perused the endorsement of the Bailiff and postal endorsement. The grounds to issue summons through paper publication is made out. Accordingly, I.A.No.2 is allowed. Issue summons to defendant No.1 through paper publication. Office is to verify the draft furnished by the plaintiff and give for publication by 28.11.2026.",
+    "createdAt": "2026-10-16T15:00:00Z"
+  },
+  {
+    "id": "ord-4",
+    "title": "Notice on I.A. No. 1 and Suit Summons with Direction on Safe Custody of Documents",
+    "caseRegistrationNumber": "O.S. 7280/2026",
+    "court": "City Civil Court, Bengaluru",
+    "orderDate": "2026-11-05",
+    "orderType": "Suit Summons",
+    "parties": "Plaintiff vs Urban Standz Pvt Ltd & Landlord",
+    "judge": "City Civil Judge",
+    "orderSummary": "Counsel for plaintiff filed documents in compliance with office objections. Court directed issuance of suit summons to Defendants 1 & 2 and ordered rental agreement to be preserved in safe lockers.",
+    "fullText": "05/11/2026: Case called. Counsel for Plaintiff files memo with documents as per the list in compliance with office objections. Heard. In view of production of documents office is directed to issue Suit summons to defendant No.1 and 2 through Court and by speed post. Office to separate rental agreement and keep the same in safe lockers. Call on 03-12-2026.",
+    "createdAt": "2026-11-05T14:00:00Z"
+  },
+  {
+    "id": "ord-5",
+    "title": "Criminal Summons Ordered to Accused Directors under Sec 138 Negotiable Instruments Act",
+    "caseRegistrationNumber": "C.C./58978/2026",
+    "court": "Chief Judicial Magistrate, Bengaluru City",
+    "orderDate": "2026-09-07",
+    "orderType": "Warrant / SS",
+    "parties": "Complainant Landlord vs Accused Directors, Urban Standz Pvt Ltd",
+    "judge": "Chief Judicial Magistrate",
+    "orderSummary": "Criminal complaint registered following dishonour of cheques issued towards guaranteed rent. Court ordered issuance of summons to the accused company management.",
+    "fullText": "07/09/2026: ISSUE SS TO ACCUSED. Call on 31/10/2026.\n31/10/2026: PO IS ON TRAINING. CALL ON.",
+    "createdAt": "2026-09-07T10:30:00Z"
+  }
+]

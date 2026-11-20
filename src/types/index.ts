@@ -57,8 +57,71 @@ export interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
+export type MainSection = 
+  | 'about' 
+  | 'cases' 
+  | 'orders' 
+  | 'media' 
+  | 'victims' 
+  | 'news' 
+  | 'contact';
+
+export interface VictimItem {
+  id: string;
+  name: string;
+  role: 'Tenant' | 'House Owner' | 'Both';
+  phone?: string;
+  email?: string;
+  firNumber?: string;
+  caseDetails?: string;
+  area?: string;
+  comments?: string;
+  createdAt: string;
+  isVerified?: boolean;
+}
+
+export interface VictimContactMessage {
+  victimId: string;
+  victimName: string;
+  senderName: string;
+  senderContact: string;
+  senderRole: string;
+  message: string;
+}
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  date: string;
+  source: string;
+  summary: string;
+  content?: string;
+  url?: string;
+  category: 'Police & FIR' | 'Court Proceeding' | 'Victim Action' | 'Advisory' | 'Media Expose';
+  tags?: string[];
+}
+
+export interface CourtOrder {
+  id: string;
+  title: string;
+  caseRegistrationNumber: string;
+  court: string;
+  orderDate: string;
+  orderType: 'Interim Injunction' | 'Status Quo' | 'Suit Summons' | 'Paper Publication' | 'Warrant / SS' | 'Final Judgment' | 'Daily Order Sheet' | string;
+  parties?: string;
+  judge?: string;
+  orderSummary: string;
+  fullText?: string;
+  pdfUrl?: string; // Data URL or external URL
+  pdfFileName?: string;
+  pdfFileSize?: string;
+  linkedCaseId?: string;
+  createdAt: string;
+}
+
 export interface CloudConfig {
   useSupabase: boolean;
   supabaseUrl: string;
   supabaseAnonKey: string;
 }
+

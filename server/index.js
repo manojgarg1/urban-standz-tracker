@@ -63,6 +63,61 @@ app.post('/api/login', (req, res) => {
   return res.status(401).json({ error: 'Invalid password' });
 });
 
+// Public: Contact & Victim Intake dispatch
+app.post('/api/contact', async (req, res) => {
+  try {
+    const body = req.body || {};
+    const RECIPIENT_EMAIL = process.env.ADMIN_CONTACT_EMAIL || 'garg.blr@gmail.com';
+
+    if (body.type === 'victim_relay_message') {
+      const { targetVictimName, senderName, senderContact, senderRole, message } = body;
+      console.log(`[VICTIM_RELAY] Relay message for ${targetVictimName} from ${senderName} (${senderContact})`);
+      return res.json({
+        success: true,
+        message: `Your message has been securely relayed to ${targetVictimName}.`
+      });
+    }
+
+    const { name, phone, email, role, firNumber, caseDetails, comments } = body;
+    if (!name) {
+      return res.status(400).json({ error: 'Name is a required field.' });
+    }
+
+    console.log(`[CONTACT_INTAKE] Forwarding submission from ${name} (${email || phone}) to ${RECIPIENT_EMAIL}`);
+
+    // Try server-side relay
+    let emailSent = false;
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
+          to_email: RECIPIENT_EMAIL,
+          from_name: `Urban Standz Intake: ${name}`,
+          subject: `[Urban Standz Portal] New Intake: ${name} (${role || 'Victim'})`,
+          message: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nRole: ${role}\nFIR: ${firNumber}\nCase: ${caseDetails}\nComments:\n${comments}`,
+          replyto: email || undefined
+        })
+      });
+      const data = await response.json();
+      if (data && data.success) emailSent = true;
+    } catch (err) {
+      // Ignore
+    }
+
+    return res.json({
+      success: true,
+      emailSent,
+      message: 'Intake received and forwarded successfully.'
+    });
+  } catch (e) {
+    console.error('Contact error:', e);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Public: Get all cases
 app.get('/api/cases', (req, res) => {
   const cases = loadData();

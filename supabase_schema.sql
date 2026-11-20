@@ -95,3 +95,75 @@ FOR ALL
 USING (true) 
 WITH CHECK (true);
 
+-- ==========================================================
+-- 7. Create Victims Directory Table
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS public.victims (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  phone TEXT,
+  email TEXT NOT NULL,
+  role TEXT DEFAULT 'Tenant',
+  fir_number TEXT,
+  case_details TEXT,
+  area TEXT,
+  comments TEXT,
+  is_verified BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_victims_created_at ON public.victims(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_victims_role ON public.victims(role);
+
+ALTER TABLE public.victims ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public users can view victims" 
+ON public.victims 
+FOR SELECT 
+USING (true);
+
+CREATE POLICY "Public with anon key can register victims" 
+ON public.victims 
+FOR ALL 
+USING (true) 
+WITH CHECK (true);
+
+-- ==========================================================
+-- 8. Create Orders and Judgments Table (with PDF support)
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS public.orders (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  case_registration_number TEXT NOT NULL,
+  court TEXT NOT NULL,
+  order_date DATE,
+  order_type TEXT DEFAULT 'Interim Injunction',
+  parties TEXT,
+  judge TEXT,
+  order_summary TEXT,
+  full_text TEXT,
+  pdf_url TEXT,
+  pdf_file_name TEXT,
+  pdf_file_size TEXT,
+  linked_case_id TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_case_reg ON public.orders(case_registration_number);
+CREATE INDEX IF NOT EXISTS idx_orders_order_date ON public.orders(order_date DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_order_type ON public.orders(order_type);
+
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public users can view orders" 
+ON public.orders 
+FOR SELECT 
+USING (true);
+
+CREATE POLICY "Public with anon key can write orders" 
+ON public.orders 
+FOR ALL 
+USING (true) 
+WITH CHECK (true);
+
+

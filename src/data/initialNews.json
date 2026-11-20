@@ -1,0 +1,62 @@
+[
+  {
+    "id": "news-1",
+    "title": "City Civil Court Orders Paper Publication Against Absconding Urban Standz Promoters",
+    "date": "2026-10-18",
+    "source": "Court Proceedings Daily Bulletin (Bengaluru CCH)",
+    "summary": "Following repeated failure to serve summons to the registered HSR Layout and SG Palya addresses of Urban Standz Private Limited, the Hon'ble City Civil Court allowed application under Order V Rule 20 CPC for substituted service via paper publication in Samyuktha Karnataka.",
+    "category": "Court Proceeding",
+    "url": "",
+    "tags": ["Paper Publication", "Order V Rule 20", "City Civil Court", "Summons"]
+  },
+  {
+    "id": "news-2",
+    "title": "Multiple Police Complaints Transferred to Central Crime Branch (CCB) / CID for Financial Audit",
+    "date": "2026-10-05",
+    "source": "Bengaluru Police & Community Legal Cell",
+    "summary": "With over 40 separate FIRs and police complaints registered across HSR Layout, Madiwala, SG Palya, and Bellandur police stations under IPC Sections 420 (Cheating) and 406 (Breach of Trust), senior police officials have been petitioned by victim delegations to consolidate the investigation under the CCB Financial Fraud Wing.",
+    "category": "Police & FIR",
+    "url": "",
+    "tags": ["FIR", "CCB", "Section 420 IPC", "HSR Layout PS", "Madiwala PS"]
+  },
+  {
+    "id": "news-3",
+    "title": "Ad-Interim Injunctions Granted to Protect Tenants from Forceful Dispossession Without Due Process",
+    "date": "2026-09-28",
+    "source": "Bengaluru Civil Courts Order Analysis",
+    "summary": "Several benches of the Bengaluru City Civil and Sessions Court (including CCH-23 and CCH-31) have passed ad-interim orders of temporary injunction and status quo under Order 39 Rules 1 & 2 of CPC, restraining landlords and third parties from disconnecting electricity/water or forcibly dispossessing tenants except by due process of law.",
+    "category": "Court Proceeding",
+    "url": "",
+    "tags": ["Temporary Injunction", "Order 39 CPC", "Tenant Protection", "Due Process"]
+  },
+  {
+    "id": "news-4",
+    "title": "Major TV News Channel Airs Special Expose on Fake Sub-Lease Rental Guarantee Racket",
+    "date": "2026-09-15",
+    "source": "National TV Broadcast & Digital Media",
+    "summary": "Investigative journalists visited the locked corporate premises of M/s Urban Standz Pvt Ltd in HSR Layout and interviewed scores of aggrieved young IT professionals, families, and senior citizen house owners whose life savings and pensions were siphoned.",
+    "category": "Media Expose",
+    "url": "https://www.youtube.com/watch?v=79THfr1b7mI",
+    "tags": ["TV Expose", "Investigative Journalism", "HSR Layout", "Video"]
+  },
+  {
+    "id": "news-5",
+    "title": "Legal Advisory Issued: Why Tenants and House Owners Must Avoid Conflict and Jointly Sue the Company",
+    "date": "2026-08-30",
+    "source": "Legal Aid Forum & Victim Coordination Committee",
+    "summary": "Senior advocates representing both tenants and house owners emphasize that infighting between owners and tenants only benefits the absconding directors of Urban Standz. Both sides are advised to document payment trails, file Section 138 NI Act notices within statutory limits, and seek joint attachment of company bank accounts.",
+    "category": "Advisory",
+    "url": "",
+    "tags": ["Legal Advisory", "Sec 138 NI Act", "Tenant Owner Coordination", "Bank Attachment"]
+  },
+  {
+    "id": "news-6",
+    "title": "Victims Action Group Launches Online Portal to Track 83+ Cases Across Bengaluru Courts",
+    "date": "2026-08-20",
+    "source": "Community Press Release",
+    "summary": "Manoj Garg, one of the affected victims, spearheaded the creation of the Urban Standz Legal Victims Action Portal to bring transparency to ongoing court dates, hearing stages, FIR logs, and interim orders across Bengaluru courts.",
+    "category": "Victim Action",
+    "url": "",
+    "tags": ["Victim Action", "Portal Launch", "Court Tracker", "Transparency"]
+  }
+]
