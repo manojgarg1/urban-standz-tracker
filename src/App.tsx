@@ -51,7 +51,8 @@ import {
 } from './services/orderService';
 import { 
   getAllVictims, 
-  deleteVictim 
+  deleteVictim,
+  clearAllVictims 
 } from './services/victimService';
 import { 
   getAllNews, 
@@ -361,6 +362,11 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleClearAllVictims = async () => {
+    await clearAllVictims();
+    setVictims([]);
+  };
+
   // Linked Case and Registration No Selection
   const handleSelectCaseNumber = (caseRegNo: string) => {
     const cleanTarget = caseRegNo.replace(/[\/\s]/g, '').toLowerCase();
@@ -569,6 +575,7 @@ export const App: React.FC = () => {
               isAdmin={isAdmin}
               onNavigateToContact={() => setMainSection('contact')}
               onDeleteVictim={handleDeleteVictim}
+              onClearAllVictims={handleClearAllVictims}
             />
           )}
 

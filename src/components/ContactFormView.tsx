@@ -332,28 +332,31 @@ export const ContactFormView: React.FC<ContactFormViewProps> = ({
               </div>
             </div>
 
-            {/* Optional Directory Listing Checkbox */}
-            <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
-              <label className="flex items-start space-x-2.5 cursor-pointer">
+            {/* "Add me in Victim's Directory" Checkbox */}
+            <div className="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-2.5">
+              <label className="flex items-center space-x-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={listInDirectory}
                   onChange={(e) => setListInDirectory(e.target.checked)}
-                  className="mt-0.5 rounded bg-slate-900 border-slate-700 text-court-600 focus:ring-0"
+                  className="w-4 h-4 rounded bg-slate-900 border-slate-700 text-court-600 focus:ring-court-500 cursor-pointer"
                 />
-                <span className="text-xs text-slate-300 leading-snug">
-                  Also list my dispute summary in the <strong>Victims Directory</strong> for mutual awareness (your phone number and email address will strictly NOT be shown).
+                <span className="text-sm font-semibold text-white">
+                  Add me in Victim's Directory
                 </span>
               </label>
+              <p className="text-[11px] text-slate-400 pl-7 leading-relaxed">
+                If checked, your name, role, and case dispute summary will be listed in the public Victims Directory. Your phone number and email will strictly remain confidential.
+              </p>
 
               {listInDirectory && (
-                <div className="pt-2 pl-6">
+                <div className="pt-2 pl-7">
                   <input
                     type="text"
                     value={area}
                     onChange={(e) => setArea(e.target.value)}
-                    placeholder="Your locality / area in Bengaluru (e.g. HSR Layout, BTM Layout, Tavarekere)"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 text-xs"
+                    placeholder="Your Locality / Area in Bengaluru (Optional, e.g. HSR Layout, BTM Layout, Tavarekere)"
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-court-500"
                   />
                 </div>
               )}

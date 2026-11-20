@@ -19,13 +19,15 @@ interface VictimsDirectoryViewProps {
   isAdmin: boolean;
   onNavigateToContact: () => void;
   onDeleteVictim: (victim: VictimItem) => void;
+  onClearAllVictims?: () => void;
 }
 
 export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
   victims,
   isAdmin,
   onNavigateToContact,
-  onDeleteVictim
+  onDeleteVictim,
+  onClearAllVictims
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<'All' | 'Tenant' | 'House Owner' | 'Both'>('All');
@@ -75,13 +77,29 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={onNavigateToContact}
-          className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all shrink-0 self-start sm:self-auto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Register Case in Directory</span>
-        </button>
+        <div className="flex items-center space-x-2 shrink-0 self-start sm:self-auto">
+          {isAdmin && victims.length > 0 && onClearAllVictims && (
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to remove ALL victim records from the directory?')) {
+                  onClearAllVictims();
+                }
+              }}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 text-xs font-semibold transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Clear Directory</span>
+            </button>
+          )}
+
+          <button
+            onClick={onNavigateToContact}
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Admin Contact Form</span>
+          </button>
+        </div>
       </div>
 
       {/* Metrics Row */}
@@ -112,56 +130,58 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
           <Lock className="w-4 h-4" />
         </div>
         <p className="text-slate-400 leading-relaxed text-[11px]">
-          <strong className="text-slate-200">Privacy Safeguard:</strong> Personal contact numbers and email addresses are never displayed in the public directory. Only verified case dispute summaries, FIR numbers, and court references are shared for collective awareness.
+          <strong className="text-slate-200">Privacy Safeguard:</strong> Personal phone numbers and email addresses are never displayed in the public directory. Only verified case dispute summaries, FIR numbers, and court references are shared for collective awareness.
         </p>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search victims by name, area, FIR number, court case details..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-court-500"
-            />
+      {/* Filter and Search Bar (shown when entries exist) */}
+      {victims.length > 0 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex-1 w-full">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search victims by name, area, FIR number, court case details..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-court-500"
+              />
+            </div>
+
+            <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
+              {(['All', 'Tenant', 'House Owner', 'Both'] as const).map(role => (
+                <button
+                  key={role}
+                  onClick={() => setSelectedRole(role)}
+                  className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    selectedRole === role
+                      ? 'bg-court-600 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {role === 'All' ? 'All Roles' : role}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800 w-full sm:w-auto">
-            {(['All', 'Tenant', 'House Owner', 'Both'] as const).map(role => (
+          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+            <span>Showing {filteredVictims.length} of {victims.length} victims</span>
+            {(searchQuery || selectedRole !== 'All') && (
               <button
-                key={role}
-                onClick={() => setSelectedRole(role)}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  selectedRole === role
-                    ? 'bg-court-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedRole('All');
+                }}
+                className="text-court-400 hover:underline"
               >
-                {role === 'All' ? 'All Roles' : role}
+                Reset Filters
               </button>
-            ))}
+            )}
           </div>
         </div>
-
-        <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
-          <span>Showing {filteredVictims.length} of {victims.length} victims</span>
-          {(searchQuery || selectedRole !== 'All') && (
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedRole('All');
-              }}
-              className="text-court-400 hover:underline"
-            >
-              Reset Filters
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Victims Cards Grid */}
       {filteredVictims.length === 0 ? (
@@ -170,16 +190,16 @@ export const VictimsDirectoryView: React.FC<VictimsDirectoryViewProps> = ({
             <Users className="w-8 h-8 text-court-400/60" />
           </div>
           <div className="space-y-1.5 max-w-md mx-auto">
-            <h3 className="text-base font-bold text-white">No Registered Victims Listed Yet</h3>
+            <h3 className="text-base font-bold text-white">Victim's Directory is Empty</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              This directory is populated when affected tenants or property owners submit their dispute details. If you have been defrauded by Urban Standz, submit your case details to be registered.
+              No entries are currently listed. When sending a message to the Admin, check <strong>"Add me in Victim's Directory"</strong> to have your case dispute summary listed here for mutual awareness.
             </p>
           </div>
           <button
             onClick={onNavigateToContact}
-            className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all"
+            className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-court-600 hover:bg-court-500 text-white text-xs font-semibold shadow-lg shadow-court-600/30 transition-all cursor-pointer"
           >
-            <span>Register in Directory</span>
+            <span>Go to Admin Contact Form</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

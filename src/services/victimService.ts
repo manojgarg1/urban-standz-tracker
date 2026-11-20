@@ -3,8 +3,7 @@ import initialVictimsData from '../data/initialVictims.json';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getCloudConfig } from './caseService';
 
-const STORAGE_KEY = 'urban_standz_victims_v2';
-const OLD_STORAGE_KEY = 'urban_standz_victims_v1';
+const STORAGE_KEY = 'urban_standz_victims_v3';
 let supabaseClient: SupabaseClient | null = null;
 
 // Initialize Supabase if configured
@@ -22,9 +21,10 @@ if (config.useSupabase && config.supabaseUrl && config.supabaseAnonKey) {
  * Only genuine submitted cases are stored. Zero mock contacts.
  */
 export async function getAllVictims(): Promise<VictimItem[]> {
-  // Purge any legacy mock contacts in localStorage
-  if (typeof window !== 'undefined' && localStorage.getItem(OLD_STORAGE_KEY)) {
-    localStorage.removeItem(OLD_STORAGE_KEY);
+  // Purge any legacy mock contacts in localStorage from previous sessions
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('urban_standz_victims_v1');
+    localStorage.removeItem('urban_standz_victims_v2');
   }
 
   if (supabaseClient) {
@@ -58,7 +58,9 @@ export async function getAllVictims(): Promise<VictimItem[]> {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed)) {
-        return parsed;
+        // Filter out any lingering mock IDs
+        const cleaned = parsed.filter(v => !['vic-1', 'vic-2', 'vic-3', 'vic-4', 'vic-5', 'vic-6', 'vic-7', 'vic-8'].includes(v.id));
+        return cleaned;
       }
     } catch (e) {
       console.error('Error parsing local victims:', e);
@@ -72,7 +74,7 @@ export async function getAllVictims(): Promise<VictimItem[]> {
 }
 
 /**
- * Save or Add a victim entry (Called by Contact form submission & Admin)
+ * Save or Add a victim entry (Called ONLY when "Add me in Victim's Directory" is checked)
  * Phone and email are strictly omitted from directory listing to preserve privacy.
  */
 export async function saveVictim(item: Partial<VictimItem>): Promise<VictimItem> {
@@ -127,7 +129,7 @@ export async function saveVictim(item: Partial<VictimItem>): Promise<VictimItem>
 }
 
 /**
- * Delete a victim entry (Admin only)
+ * Delete a single victim entry (Admin only)
  */
 export async function deleteVictim(id: string): Promise<void> {
   const current = await getAllVictims();
@@ -137,6 +139,25 @@ export async function deleteVictim(id: string): Promise<void> {
   if (supabaseClient) {
     try {
       await supabaseClient.from('victims').delete().eq('id', id);
+    } catch (err) {
+      // Fail silently
+    }
+  }
+}
+
+/**
+ * Clear all victims from directory completely
+ */
+export async function clearAllVictims(): Promise<void> {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('urban_standz_victims_v1');
+    localStorage.removeItem('urban_standz_victims_v2');
+  }
+
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('victims').delete().neq('id', '___none___');
     } catch (err) {
       // Fail silently
     }
