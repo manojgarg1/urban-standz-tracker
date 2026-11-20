@@ -97,11 +97,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'contact',
-      label: 'Contact & Intake',
+      label: 'Admin Contact',
       icon: Mail,
-      badge: 'Intake',
+      badge: 'Email Admin',
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-      description: 'Register Case & Join Action Group'
+      description: 'Send Confidential Message to Admin'
     }
   ];
 
@@ -232,7 +232,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => handleSelect('contact')}
               className="w-full py-1.5 px-3 rounded-lg bg-court-600 hover:bg-court-500 text-white text-xs font-semibold text-center transition-colors shadow-sm"
             >
-              Register Case / Contact
+              Contact Admin
             </button>
           </div>
 

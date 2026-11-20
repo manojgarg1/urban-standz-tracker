@@ -1,5 +1,5 @@
 // Vercel Serverless Function: /api/contact
-// Securely forwards victim contact submissions and peer messages to the administrator/victim without exposing emails or phones externally.
+// Securely forwards Admin Contact submissions and Victim Intake to the administrator without exposing the destination email externally.
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -21,79 +21,55 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
+    // Server-side recipient email (STRICTLY CONFIDENTIAL - Never exposed to client)
     const RECIPIENT_EMAIL = process.env.ADMIN_CONTACT_EMAIL || 'garg.blr@gmail.com';
 
-    // Check if this is a secure peer message to a registered victim
-    if (body.type === 'victim_relay_message') {
-      const { targetVictimName, senderName, senderContact, senderRole, message } = body;
-      const emailSubject = `[Urban Standz] Secure Peer Message for: ${targetVictimName || 'Victim'}`;
-      const emailBody = `
-New Peer Message via Urban Standz Victims Directory
----------------------------------------------------
-To: ${targetVictimName}
-From: ${senderName} (${senderRole || 'Peer Victim / Advocate'})
-Sender Contact: ${senderContact}
+    const { 
+      name, 
+      phone, 
+      email, 
+      subject, 
+      userType, 
+      role, 
+      firNumber, 
+      caseDetails, 
+      message, 
+      comments 
+    } = body;
 
-Message Content:
-${message}
-
-Sent At: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
----------------------------------------------------
-Privacy Notice: The recipient's email/phone was NOT disclosed to the sender.
-      `.trim();
-
-      console.log(`[VICTIM_RELAY] Relay message for ${targetVictimName} from ${senderName}`);
-
-      try {
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
-            to_email: RECIPIENT_EMAIL,
-            from_name: `Portal Message for ${targetVictimName}`,
-            subject: emailSubject,
-            message: emailBody
-          })
-        });
-      } catch (err) {
-        // Ignore
-      }
-
-      return res.status(200).json({
-        success: true,
-        message: `Your message has been securely relayed to ${targetVictimName}.`
-      });
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and Email are required fields.' });
     }
 
-    // Otherwise, standard Intake Form submission
-    const { name, phone, email, role, firNumber, caseDetails, comments } = body;
-
-    if (!name) {
-      return res.status(400).json({ error: 'Name is a required field.' });
-    }
-
-    const emailSubject = `[Urban Standz Portal] New Intake: ${name} (${role || 'Victim'})`;
+    const senderRole = userType || role || 'Visitor';
+    const emailSubject = `[Urban Standz Admin Contact] ${subject || 'New Message'} from ${name} (${senderRole})`;
+    
     const emailBody = `
-New Intake Submission from Urban Standz Legal Action Portal
----------------------------------------------------
-Name: ${name}
-Phone: ${phone || 'Not provided'}
-Email: ${email || 'Not provided'}
-Role: ${role || 'Not specified'}
-FIR Number: ${firNumber || 'None'}
-Court Case Details: ${caseDetails || 'None'}
+===================================================
+New Admin Contact Message - Urban Standz Action Portal
+===================================================
+Sender Name:    ${name}
+Sender Phone:   ${phone || 'Not provided'}
+Sender Email:   ${email}
+Category / Role:${senderRole}
+Subject:        ${subject || 'General Inquiry'}
 
-Comments / Details of Dispute:
-${comments || 'No additional comments provided'}
+FIR Number:     ${firNumber || 'N/A'}
+Court Case:     ${caseDetails || 'N/A'}
 
-Submitted At: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+Message / Details:
 ---------------------------------------------------
-This message was securely dispatched by the Urban Standz Portal Server.
+${message || comments || 'No message provided'}
+
+---------------------------------------------------
+Submitted At:   ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+Privacy Status: Securely routed by Portal Server. Recipient email kept strictly confidential.
+===================================================
     `.trim();
 
-    console.log(`[CONTACT_DISPATCH] Intake received from ${name} (${email || phone})`);
+    console.log(`[ADMIN_CONTACT_DISPATCH] Forwarding message from ${name} (${email}) to Admin`);
 
+    // Dispatch via server-side relay
     let emailSent = false;
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -102,27 +78,28 @@ This message was securely dispatched by the Urban Standz Portal Server.
         body: JSON.stringify({
           access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
           to_email: RECIPIENT_EMAIL,
-          from_name: `Urban Standz Intake: ${name}`,
+          from_name: `Urban Standz Contact: ${name}`,
           subject: emailSubject,
           message: emailBody,
-          replyto: email || undefined
+          replyto: email
         })
       });
       const data = await response.json();
       if (data && data.success) {
         emailSent = true;
       }
-    } catch (e) {
-      console.warn('[CONTACT_DISPATCH] Web3Forms relay note:', e.message);
+    } catch (relayErr) {
+      console.warn('[ADMIN_CONTACT_RELAY_NOTE]:', relayErr.message);
     }
 
+    // Always return safe client response without any email information
     return res.status(200).json({
       success: true,
       emailSent,
-      message: 'Submission successfully received and added to Victims Directory.'
+      message: 'Your message has been securely sent to the administrator. We will get back to you shortly.'
     });
   } catch (error) {
-    console.error('[CONTACT_DISPATCH_ERROR]:', error);
-    return res.status(500).json({ error: 'Internal server error processing submission' });
+    console.error('[ADMIN_CONTACT_ERROR]:', error);
+    return res.status(500).json({ error: 'Internal server error processing contact request' });
   }
 }

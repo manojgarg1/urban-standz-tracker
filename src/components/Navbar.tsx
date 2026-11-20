@@ -60,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'news':
         return 'Latest News & Updates';
       case 'contact':
-        return 'Contact & Case Intake';
+        return 'Admin Contact';
       default:
         return 'Urban Standz Legal Tracker';
     }

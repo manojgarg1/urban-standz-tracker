@@ -63,27 +63,33 @@ app.post('/api/login', (req, res) => {
   return res.status(401).json({ error: 'Invalid password' });
 });
 
-// Public: Contact & Victim Intake dispatch
+// Public: Contact & Admin Contact dispatch
 app.post('/api/contact', async (req, res) => {
   try {
     const body = req.body || {};
     const RECIPIENT_EMAIL = process.env.ADMIN_CONTACT_EMAIL || 'garg.blr@gmail.com';
 
-    if (body.type === 'victim_relay_message') {
-      const { targetVictimName, senderName, senderContact, senderRole, message } = body;
-      console.log(`[VICTIM_RELAY] Relay message for ${targetVictimName} from ${senderName} (${senderContact})`);
-      return res.json({
-        success: true,
-        message: `Your message has been securely relayed to ${targetVictimName}.`
-      });
+    const { 
+      name, 
+      phone, 
+      email, 
+      subject, 
+      userType, 
+      role, 
+      firNumber, 
+      caseDetails, 
+      message, 
+      comments 
+    } = body;
+
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and Email are required fields.' });
     }
 
-    const { name, phone, email, role, firNumber, caseDetails, comments } = body;
-    if (!name) {
-      return res.status(400).json({ error: 'Name is a required field.' });
-    }
+    const senderRole = userType || role || 'Visitor';
+    const emailSubject = `[Urban Standz Admin Contact] ${subject || 'New Message'} from ${name} (${senderRole})`;
 
-    console.log(`[CONTACT_INTAKE] Forwarding submission from ${name} (${email || phone}) to ${RECIPIENT_EMAIL}`);
+    console.log(`[ADMIN_CONTACT] Forwarding message from ${name} (${email}) to Admin`);
 
     // Try server-side relay
     let emailSent = false;
@@ -94,10 +100,10 @@ app.post('/api/contact', async (req, res) => {
         body: JSON.stringify({
           access_key: process.env.WEB3FORMS_ACCESS_KEY || 'urban-standz-action-portal',
           to_email: RECIPIENT_EMAIL,
-          from_name: `Urban Standz Intake: ${name}`,
-          subject: `[Urban Standz Portal] New Intake: ${name} (${role || 'Victim'})`,
-          message: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}\nRole: ${role}\nFIR: ${firNumber}\nCase: ${caseDetails}\nComments:\n${comments}`,
-          replyto: email || undefined
+          from_name: `Urban Standz Contact: ${name}`,
+          subject: emailSubject,
+          message: `Sender: ${name}\nPhone: ${phone}\nEmail: ${email}\nRole: ${senderRole}\nSubject: ${subject}\nFIR: ${firNumber}\nCase: ${caseDetails}\n\nMessage:\n${message || comments}`,
+          replyto: email
         })
       });
       const data = await response.json();
@@ -109,13 +115,14 @@ app.post('/api/contact', async (req, res) => {
     return res.json({
       success: true,
       emailSent,
-      message: 'Intake received and forwarded successfully.'
+      message: 'Your message has been securely sent to the administrator.'
     });
   } catch (e) {
     console.error('Contact error:', e);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Public: Get all cases
